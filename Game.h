@@ -5,7 +5,7 @@
 #ifndef GO_GAME_H
 #define GO_GAME_H
 
-#include <cstdio>
+#include  <cstdio>
 #include "conio2.h"
 
 

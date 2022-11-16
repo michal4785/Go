@@ -37,44 +37,31 @@ Game::Game(int size){
 }
 void Game::printMenu(int y, int x){
     gotoxy(x, y);
-    cputs("Name: Michal");
-    gotoxy(x, y + 1);
-    cputs("Surname: Ganczarenko");
-    gotoxy(x, y + 2);
-    cputs("Index number: 188818");
-    gotoxy(x, y + 3);
-    cputs("arrows = cursor moving");
-    gotoxy(x, y + 4);
-    cputs("q       = exit");
-    gotoxy(x, y + 5);
-    cputs("n       = new game (not implemented)");
-    gotoxy(x, y + 6);
-    cputs("enter   = confirm choice and end turn (not implemented)");
-    gotoxy(x, y + 7);
-    cputs("esc       = cancel  (not implemented)");
-    gotoxy(x, y + 8);
-    cputs("i       = place a stone (not implemented)");
-    gotoxy(x, y + 9);
-    cputs("s       = save game (not implemented)");
-    gotoxy(x, y + 10);
-    cputs("l       = load game (not implemented)");
-    gotoxy(x, y + 11);
-    cputs("f       = finish game (not implemented)");
-    gotoxy(x, y + 12);
-    cputs("space   = change color");
-    gotoxy(x, y + 13);
+    FILE *file;
+    file = fopen("./../menu.txt", "r");
+    char    line[BUFFER];
+    if(file == nullptr) {
+        cputs("Problem with loading menu...");
+    }
+    else{
+        while(fgets(line, BUFFER, file)){
+            cputs(line);
+            gotoxy(x, ++y);
+        }
+        fclose(file);
+    }
     cputs("enter   = change background color");
     if(zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
     else sprintf(txt, "key code: 0x%02x", zn);
-    gotoxy(x, y + 14);
+    gotoxy(x, y++);
     cputs(txt);
-    gotoxy(x, y + 15);
+    gotoxy(x, y++);
     sprintf(txt, "Y: %d\tX: %d", cursorY, cursorX);
     cputs(txt);
-    gotoxy(x, y + 16);
+    gotoxy(x, y++);
     sprintf(txt, "White: %d\tBlack: %d", whitePlayerScoresNumber, blackPlayerScoresNumber);
     cputs(txt);
-    gotoxy(x, y + 17);
+    gotoxy(x, y++);
     if(player == 1){
         cputs("Current player: BLACK");
     }

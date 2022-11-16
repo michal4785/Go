@@ -1,0 +1,13 @@
+Name: Michal
+Surname: Ganczarenko
+Index number: 188818
+arrows = cursor moving
+q       = exit
+n       = new game
+esc       = cancel
+i       = place a stone
+s       = save game
+l       = load game
+f       = finish game (not implemented)
+space   = change color
+enter   = change background color
