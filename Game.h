@@ -11,7 +11,9 @@
 
 class Game {
 public:
-    explicit Game(int size);
+    Game();
+    void selectSize();
+    void printClearBoard(int y, int x, int givenSize);
     void printMenu(int y, int x);
     void printBoard(int y, int x);
     void listenKeys();

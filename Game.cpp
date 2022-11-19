@@ -10,8 +10,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-Game::Game(int size){
-    this->size = size;
+Game::Game(){
     zn = 0;
     cursorX =  1;
     cursorY = 1;
@@ -25,6 +24,7 @@ Game::Game(int size){
     txt = new char[BUFFER];
     whitePlayerScoresNumber = 0;
     blackPlayerScoresNumber = 0;
+    selectSize();
     board = new char * [size];
     for (int i = 0; i < size; ++i) {
         board[i] = new char[size];
@@ -35,6 +35,97 @@ Game::Game(int size){
     boardLeftCornerX = DEFAULT_BOARD_X;
     boardLeftCornerY = DEFAULT_BOARD_Y;
 }
+
+
+void Game::selectSize(){
+    int y = 5;
+    int x = 5;
+    printClearBoard(y, x, 9);
+    x += 22;
+    printClearBoard(y, x, 13);
+    x += 30;
+    printClearBoard(y, x, 19);
+    gotoxy(5, 30);
+    cputs("Select the size of the board:");
+    gotoxy(5, 31);
+    cputs("1) 9 x 9 (press 1)");
+    gotoxy(5, 32);
+    cputs("2) 13 x 13 (press 2)");
+    gotoxy(5, 33);
+    cputs("3) 19 x 19 (press 3)");
+    gotoxy(5, 34);
+    cputs("4) Custom (press 4)");
+    zn = getchar();
+    while(zn != '1' && zn != '2' && zn != '3' && zn != '4'){
+        zn = getchar();
+    }
+    switch(zn){
+        case '1':
+            size = 9;
+            break;
+        case '2':
+            size = 13;
+            break;
+        case '3':
+            size = 19;
+            break;
+        case '4':
+            gotoxy(5, 35);
+            puts( "Input the custom size: ");
+            size = 0;
+            do{
+                zn =  getch();
+                if(int(zn) >= int('0') && int(zn) <= int('9')){
+                    size *= 10;
+                    size += int(zn) - int('0');
+                }
+                gotoxy(5, 35);
+                sprintf(txt, "Input the custom size: %d", size);
+                cputs(txt);
+            }while(zn != 0x0d);
+            break;
+    }
+    clrscr();
+}
+
+
+void Game::printClearBoard(int y, int x, int givenSize){
+    gotoxy(x, y);
+    putch('+');
+    gotoxy(x + 2 * givenSize + 1, y);
+    putch('+');
+    gotoxy(x , y + givenSize + 1);
+    putch('+');
+    gotoxy(x + 2 * givenSize + 1, y + givenSize + 1);
+    putch('+');
+    for (int i = 0; i < givenSize; ++i) {
+        gotoxy(x, y + i + 1);
+        putch('|');
+    }
+    for (int i = 0; i < givenSize; ++i) {
+        gotoxy(x + i*2 + 1, y);
+        putch('-');
+    }
+    for (int i = 0; i < givenSize; ++i) {
+        gotoxy(x + 2 * givenSize + 1, y + i + 1);
+        putch('|');
+    }
+    for (int i = 0; i < givenSize; ++i) {
+        gotoxy(x + i*2 + 1, y + givenSize + 1);
+        putch('-');
+    }
+    for (int i = 0; i < givenSize; ++i) {
+        for (int j = 0; j < givenSize; ++j) {
+            gotoxy(x + j*2 + 1, y + i + 1);
+            putch(' ');
+        }
+    }
+    gotoxy(x, y + givenSize + 3);
+    sprintf(txt, "Size:    %d x %d", givenSize, givenSize);
+    cputs(txt);
+}
+
+
 void Game::printMenu(int y, int x){
     gotoxy(x, y);
     FILE *file;
@@ -50,7 +141,6 @@ void Game::printMenu(int y, int x){
         }
         fclose(file);
     }
-    cputs("enter   = change background color");
     if(zero) sprintf(txt, "key code: 0x00 0x%02x", zn);
     else sprintf(txt, "key code: 0x%02x", zn);
     gotoxy(x, y++);
@@ -309,8 +399,11 @@ bool Game::loadGameState(char * fileName){
     char    line[BUFFER];
     sprintf(txt, "./../%s.txt", fileName);
     file = fopen(txt, "r");
-    if(file == nullptr)
+    if(file == nullptr){
+        gotoxy(boardLeftCornerX - 20, boardLeftCornerY + size + 2);
+        cputs("Loading the game failed.\nCheck if the name of the file is proper.");
         return false;
+    }
     else{
 
         fgets(line, BUFFER, file);
