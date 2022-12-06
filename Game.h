@@ -31,6 +31,8 @@ public:
     void saveGameState(char * fileName);
     bool loadGameState(char * fileName);
     void inputFileName();
+    void setInitialisation();
+    void initialiseBlackStones(int n);
 
 private:
     int zn;
@@ -47,9 +49,12 @@ private:
     char opponentCh;
     int whitePlayerScoresNumber;
     int blackPlayerScoresNumber;
+    bool kOfight;
+    bool checking;
     char ** board;
     int boardLeftCornerX;
     int boardLeftCornerY;
+    int initialisedBlackStones;
     static const int DEFAULT_MENU_X = 5;
     static const int DEFAULT_MENU_Y = 2;
     static const int DEFAULT_BOARD_X = 100;

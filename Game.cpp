@@ -1,7 +1,4 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "bugprone-branch-clone"
-#pragma ide diagnostic ignored "OCDFAInspection"
-#pragma ide diagnostic ignored "misc-no-recursion"
+
 //
 // Created by Michał on 10.11.2022.
 //
@@ -9,6 +6,7 @@
 #include "Game.h"
 #include <cstdio>
 #include <cstdlib>
+
 
 Game::Game(){
     zn = 0;
@@ -24,6 +22,7 @@ Game::Game(){
     txt = new char[BUFFER];
     whitePlayerScoresNumber = 0;
     blackPlayerScoresNumber = 0;
+    kOfight = false;
     selectSize();
     board = new char * [size];
     for (int i = 0; i < size; ++i) {
@@ -34,6 +33,7 @@ Game::Game(){
     }
     boardLeftCornerX = DEFAULT_BOARD_X;
     boardLeftCornerY = DEFAULT_BOARD_Y;
+    initialisedBlackStones = 0;
 }
 
 
@@ -218,6 +218,7 @@ void Game::listenKeys(){
     else if(zn == 0x0d) back = (back + 1) % 16;
 }
 void Game::start() {
+    setInitialisation();
     saveGameState("beforeLastMove");
     saveGameState("beforeBeforeLastMove");
 #ifndef __cplusplus
@@ -271,17 +272,21 @@ bool Game::tryToPlaceStone(int y, int x){
     else{
         updateSaves();
         board[y][x] = playerCh;
-        if(!findWayOut(y, x) || checkKO()){
+        /*if(!findWayOut(y, x) || checkKO()){
             board[y][x] = '0';
             return false;
+        }*/
+        // else{
+        if(!findWayOut(y, x) && !kOfight){
+            saveGameState("tmp");
+            checking = true;
         }
-        else{
             switchPlayer();
             int arg[4][2] = {{y+1, x}, {y-1, x},
                              {y, x+1}, {y, x-1}};
             checkTiles(arg);
             return true;
-        }
+        //}
     }
 }
 
@@ -313,12 +318,21 @@ bool Game::checkCoordsValidity(int y, int x) const{
 }
 
 void Game::checkTiles(const int coords[4][2]){
+    int counter = 0;
     for (int i = 0; i < 4; ++i) {
         int y = coords[i][0];
         int x = coords[i][1];
         if(checkCoordsValidity(y, x) && board[y][x] == playerCh && !findWayOut(y,x)){
             capture(y,x);
+            counter ++;
         }
+    }
+    if(counter == 0 && checking){
+        loadGameState("tmp");
+        checking = false;
+    }
+    else if(checking){
+        kOfight = true;
     }
 }
 
@@ -464,4 +478,40 @@ void Game::inputFileName(){
         loadGameState(fileName);
     }
 }
-#pragma clang diagnostic pop
+
+
+void Game::setInitialisation(){
+    char * number = new char[10];
+    gotoxy(10,10);
+    cputs("How many black stones would you like to initialise (end with Enter): ");
+    for (int i = 0; i < LITE_BUFFER; ++i) {
+        zn =  getch();
+        if(zn == 0x0d){
+            break;
+        }
+        number[i] = zn;
+        clrscr();
+        sprintf( txt, "How many black stones would you like to initialise (end with Enter): %s\n", number);
+        cputs(txt);
+    }
+    int n = atoi(txt);
+    initialiseBlackStones(n);
+}
+
+void Game::initialiseBlackStones(int n){
+    for (int i = 0; i < n; ++i) {
+        clrscr();
+        printMenu(DEFAULT_MENU_Y, DEFAULT_MENU_X);
+        printBoard(DEFAULT_BOARD_Y, DEFAULT_BOARD_X);
+        zero = 0;
+        zn = getch();
+        if(zn == 0) {
+            zero = 1;
+            zn = getch();
+            if(zn == 0x48 && cursorY > 1) cursorY--;
+            else if(zn == 0x50 && cursorY < size) cursorY++;
+            else if(zn == 0x4b && cursorX > 1) cursorX--;
+            else if(zn == 0x4d && cursorX < size) cursorX++;
+        } else if(zn == 'i') board[cursorY][cursorX] = '1';
+    }
+}
