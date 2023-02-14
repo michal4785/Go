@@ -1,6 +1,3 @@
-Name: Michal
-Surname: Ganczarenko
-Index number: 188818
 arrows = cursor moving
 q       = exit
 n       = new game
